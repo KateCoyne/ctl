@@ -1,0 +1,534 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
+---
+metadata:
+  title: >-
+    Petition for removal of a guardian of a minor
+  short title: >-
+    Remove guardian of minor
+  description: |-
+    This interview helps someone in Massachusetts ask the court for removal of a guardian of a minor.
+  tags:
+    - "ES-03-00-00-00"
+  authors:
+    - Kaitlin Coyne
+  original_form:
+    - https://www.mass.gov/doc/petition-for-removal-of-a-guardian-of-a-minor-mpc-240/download
+  help_page_url: >-
+    https://www.mass.gov/lists/court-forms-for-guardianship-of-a-minor
+  help_page_title: >-
+    Court forms for guardianship of a minor
+  allowed_courts: 
+    - "Probate and Family Court"
+  typical_role: "plaintiff"
+  al_weaver_version: "1.10.3"
+  generated_on: "2023-11-30"
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-PetitionForRemovalOfAGuardian'
+---
+code: |
+  interview_short_title = "Ask the court for removal of a guardian of a minor"
+---
+code: |
+  al_form_type = "starts_case" 
+---
+objects:
+  - users: ALPeopleList.using(there_are_any=True)
+---
+sections:
+  - review_petition_for_removal_of_a_guardian_: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_petition_for_removal_of_a_guardian_
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = ['Probate and Family Court']
+  nav.set_section("review_petition_for_removal_of_a_guardian_")
+  user_role = "plaintiff"
+  user_ask_role = "plaintiff"
+  users.gather()
+  set_parts(subtitle=str(users))
+  is_parent
+  appointment_date
+  set_progress(12)
+  biological_parent_can_resume_parental_responsibilities
+  parent_name_middle1
+  successor_guardian_name_middle
+  set_progress(24)
+  signature_date1
+  docket_number
+  trial_court.division
+  set_progress(36)
+  children.gather()
+  users[0].address.address
+  users[0].phone_number
+  set_progress(48)
+  respondents.gather()
+  respondents[0].address.address
+  respondents[0].phone_number
+  set_progress(60)
+  parents.gather()
+  parents[0].address.address
+  parents[0].phone_number
+  interview_order_petition_for_removal_of_a_guardian_ = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  petition_for_removal_of_a_guardian__intro
+  interview_order_petition_for_removal_of_a_guardian_
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  petition_for_removal_of_a_guardian__download
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Petition_for_removal_of_a_guardian_of_a_minor
+continue button field: petition_for_removal_of_a_guardian__intro
+question: |
+  Petition for removal of a guardian of a minor
+subquestion: |
+  This interview will help you ask the court for removal of a guardian of a minor.
+  
+  Before you get started, please gather:
+  
+  1. Your address and contact information.
+  2. The minor's current guardian's address and contact information.
+  3. The potential successor Guardian(s) information (if this will not be you).
+  
+  When you are finished, you will need to:
+  
+  1. File the completed form to the correct court either by mail, online, or in-person.
+---
+id: Petitioner s
+question: |
+  Petitioner(s)
+subquestion: |
+  The following information is about you, the Petitioner.
+fields:
+  - "If you are the minor's parent, select which applies:": is_parent
+    datatype: checkboxes
+    choices:
+      - mother
+      - father
+      - both
+  - "Is the Minor completing this form?": is_minor
+    datatype: checkboxes
+    choices: 
+      - yes
+      - no
+  - "Are you a person interested in the welfare of the Minor?": is_person_interested_in_welfare_of_minor
+    datatype: checkboxes
+    choices: 
+      - yes
+      - no
+---
+id: Guardian s
+question: |
+  Guardian(s)
+subquestion: |
+  Please fill in the date that the current Guardian(s) was appointed. In other words, when the current guardian became the minor's guardian.
+fields:
+  - "Date": appointment_date
+    datatype: date
+---
+id: Petitioner s requests that the court remove the guardian co guardians for the following reasons
+question: |
+  Biological Parents:
+subquestion: |
+  Select the box below if you are filing this petition because the minor's biological parent is able to resume parental responsibilities.
+fields:
+  - "Biological parent can resume parental responsibilities": biological_parent_can_resume_parental_responsibilities
+    datatype: yesno
+---
+id: Parents resuming responsibility
+question: |
+  Parent(s) resuming responsibility
+subquestion: |
+  This section is about the parent(s) that is resuming responsibility, if applicable.
+fields:
+  - "First Name": parent_name_first
+    maxlength: 22
+  - "Middle Name": parent_name_middle1
+    maxlength: 22
+  - "Last Name": parent_name_middle2
+    maxlength: 32
+  - "Select this box if the Minor was adopted": minor_adopted
+    datatype: yesno
+  - "Other attachments": other_attachments
+    datatype: file
+---
+id: Successor Guardian
+question: |
+  Successor Guardian
+subquestion: |
+  This section is about the successor Guardian (the person that will be the minor's Guardian if this Petition is granted)
+fields:
+  - "First Name": successor_guardian_name_first
+    maxlength: 34
+  - "Middle Name": successor_guardian_name_middle
+    maxlength: 20
+  - "Last Name": successor_guardian_name_last
+    maxlength: 34
+---
+id: Signature
+question: |
+  Signature
+fields:
+  - "Signature date": signature_date1
+    datatype: date
+  - "Signature date": signature_date2
+    datatype: date
+---
+id: preview petition_for_removal_of_a_guardian_
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_petition_for_removal_of_a_guardian_'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: petition_for_removal_of_a_guardian__preview_question    
+---
+code: |
+  signature_fields = []
+---
+code: |
+  is_mother = DAEmpty()
+---
+code: |
+  is_father = DAEmpty()
+---
+code: |
+  is_both = DAEmpty()
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  [user.address.address for user in users.complete_elements()]
+  addresses_to_search = [user.address for user in users.complete_elements()]
+---
+id: petition for removal of a guardian review screen
+event: review_petition_for_removal_of_a_guardian_
+question: |
+  Review your answers
+review:
+  - Edit: docket_number
+    button: |
+      **Docket number**:
+      ${ docket_number }
+  - Edit: trial_court
+    button: |
+      **Trial court**
+  
+      % if defined("trial_court.division"):
+      * division: ${ trial_court.division }
+      % endif
+  - Edit: children.revisit
+    button: |
+      **Children**
+
+      % for item in children:
+        * ${ item }
+      % endfor
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: is_parent
+    button: |
+      **Is minor's parent**:
+      ${ is_parent }
+  - Edit: is_mother
+    button: |
+      **Is mother**:
+      ${ is_mother }
+  - Edit: is_father
+    button: |
+      **Is father**:
+      ${ is_father }
+  - Edit: is_both
+    button: |
+      **Is both**:
+      ${ is_both }
+  - Edit: is_minor
+    button: |
+      **Is the Minor (if 14 or more years of age).**:
+      ${ word(yesno(is_minor)) }
+  - Edit: is_person_interested_in_welfare_of_minor
+    button: |
+      **Is a person interested in the welfare of the Minor**:
+      ${ word(yesno(is_person_interested_in_welfare_of_minor)) }
+  - Edit: respondents.revisit
+    button: |
+      **Respondents**
+
+      % for item in respondents:
+        * ${ item }
+      % endfor
+  - Edit: appointment_date
+    button: |
+      **Guardian was appointed on**:
+      ${ appointment_date }
+  - Edit: biological_parent_can_resume_parental_responsibilities
+    button: |
+      **Biological parent can resume parental responsibilities**:
+      ${ word(yesno(biological_parent_can_resume_parental_responsibilities)) }
+  - Edit: parent_name_middle1
+    button: |
+      **Middle Name**:
+      ${ parent_name_middle1 }
+  - Edit: parent_name_middle2
+    button: |
+      **Last Name**:
+      ${ parent_name_middle2 }
+  - Edit: parents.revisit
+    button: |
+      **Parents**
+
+      % for item in parents:
+        * ${ item }
+      % endfor
+  - Edit: minor_adopted
+    button: |
+      **The Minor was adopted**:
+      ${ word(yesno(minor_adopted)) }
+  - Edit: other_attachments
+    button: |
+      **Other attachments**:
+
+      ${ other_attachments }
+  - Edit: successor_guardian_name_middle
+    button: |
+      **Middle Name**:
+      ${ successor_guardian_name_middle }
+  - Edit: successor_guardian_name_last
+    button: |
+      **Last Name**:
+      ${ successor_guardian_name_last }
+  - Edit: successor_guardian_name_first
+    button: |
+      **First Name**:
+      ${ successor_guardian_name_first }
+  - Edit: signature_date1
+    button: |
+      **Signature date1**:
+      ${ signature_date1 }
+  - Edit: signature_date2
+    button: |
+      **Signature date2**:
+      ${ signature_date2 }
+---
+continue button field: children.revisit
+question: |
+  Edit children
+subquestion: |
+  ${ children.table }
+
+  ${ children.add_action() }
+---
+table: children.table
+rows: children
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+edit:
+  - name.first
+confirm: True
+
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.zip") else ""
+  - Phone number: |
+      row_item.phone_number if defined("row_item.phone_number") else ""
+edit:
+  - name.first
+  - address.zip
+  - phone_number
+confirm: True
+
+---
+continue button field: respondents.revisit
+question: |
+  Edit respondents
+subquestion: |
+  ${ respondents.table }
+
+  ${ respondents.add_action() }
+---
+table: respondents.table
+rows: respondents
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.zip") else ""
+  - Phone number: |
+      row_item.phone_number if defined("row_item.phone_number") else ""
+edit:
+  - name.first
+  - address.zip
+  - phone_number
+confirm: True
+
+---
+continue button field: parents.revisit
+question: |
+  Edit parents
+subquestion: |
+  ${ parents.table }
+
+  ${ parents.add_action() }
+---
+table: parents.table
+rows: parents
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.zip") else ""
+  - Phone number: |
+      row_item.phone_number if defined("row_item.phone_number") else ""
+edit:
+  - name.first
+  - address.zip
+  - phone_number
+confirm: True
+
+---
+id: download petition_for_removal_of_a_guardian_
+event: petition_for_removal_of_a_guardian__download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_petition_for_removal_of_a_guardian_'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - petition_for_removal_of_a_guardian__attachment: ALDocument.using(title="Petition for removal of a guardian of a minor", filename="petition_for_removal_of_a_guardian_", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[petition_for_removal_of_a_guardian__attachment], filename="petition_for_removal_of_a_guardian_", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[petition_for_removal_of_a_guardian__attachment],  filename="petition_for_removal_of_a_guardian_", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+---
+attachment:
+  name: petition for removal of a guardian 
+  filename: petition_for_removal_of_a_guardian_
+  variable name: petition_for_removal_of_a_guardian__attachment[i]
+  skip undefined: True
+  pdf template file: petition_for_removal_of_a_guardian_.pdf
+  fields:
+      - "docket_number": ${ docket_number }
+      - "trial_court_division": ${ trial_court.division }
+      - "child_name_middle": ${ children[0].name.middle }
+      - "child_name_last": ${ children[0].name.last }
+      - "child_name_first": ${ children[0].name.first }
+      - "users1_name_middle": ${ users[0].name.middle }
+      - "users1_name_last": ${ users[0].name.last }
+      - "users1_name_first": ${ users[0].name.first }
+      - "users1_address_address": ${ users[0].address.address }
+      - "users1_address_unit": ${ users[0].address.unit }
+      - "users1_address_city": ${ users[0].address.city }
+      - "users1_address_state": ${ users[0].address.state }
+      - "users1_address_zip": ${ users[0].address.zip }
+      - "users1_phone_number": ${ users[0].phone_number }
+      - "is_parent": ${ is_parent }
+      - "is_mother": ${ is_mother }
+      - "is_father": ${ is_father }
+      - "is_both": ${ is_both }
+      - "is_minor": ${ is_minor }
+      - "is_person_interested_in_welfare_of_minor": ${ is_person_interested_in_welfare_of_minor }
+      - "respondent_name_last": ${ respondents[0].name.last }
+      - "respondent_name_middle": ${ respondents[0].name.middle }
+      - "respondent_name_first": ${ respondents[0].name.first }
+      - "respondent_address_address": ${ respondents[0].address.address }
+      - "respondent_address_unit": ${ respondents[0].address.unit }
+      - "respondent_address_city": ${ respondents[0].address.city }
+      - "respondent_address_state": ${ respondents[0].address.state }
+      - "respondent_address_zip": ${ respondents[0].address.zip }
+      - "respondent_phone_number": ${ respondents[0].phone_number }
+      - "appointment_date": ${ appointment_date.format() }
+      - "biological_parent_can_resume_parental_responsibilities": ${ biological_parent_can_resume_parental_responsibilities }
+      - "parent_name_middle1": ${ parent_name_middle1 }
+      - "parent_name_middle2": ${ parent_name_middle2 }
+      - "parent_name_first": ${ parents[0].name.first }
+      - "parent_address_address": ${ parents[0].address.address }
+      - "parent_address_unit": ${ parents[0].address.unit }
+      - "parent_address_city": ${ parents[0].address.city }
+      - "parent_address_state": ${ parents[0].address.state }
+      - "parent_address_zip": ${ parents[0].address.zip }
+      - "parent_phone_number": ${ parents[0].phone_number }
+      - "minor_adopted": ${ minor_adopted }
+      - "other_attachments": ${ other_attachments }
+      - "successor_guardian_name_middle": ${ successor_guardian_name_middle }
+      - "successor_guardian_name_last": ${ successor_guardian_name_last }
+      - "successor_guardian_name_first": ${ successor_guardian_name_first }
+      - "signature_date1": ${ signature_date1 }
+      - "signature_date2": ${ signature_date2 }
+
+
+
